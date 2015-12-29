@@ -1,0 +1,203 @@
+        <div class="col-md-7">
+            <div id="map"  style="width:100%; height:645px"></div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="panel panel-default">
+                <!-- Panel Title -->
+                <div class="panel-heading">
+                    <h2 class="panel-title text-center">Add an incident<span class="glyphicon glyphicon-map-marker"></span></h2>
+                </div>
+                <!-- Panel Body -->
+                <div class="panel-body">
+                    <!-- Creates Form (novalidate disables HTML validation, Angular will control) -->
+                    <form name ="addForm" novalidate>
+                        <!-- Text Boxes and Other User Inputs. Note ng-model binds the values to Angular $scope -->
+                        <label class="radio control-label">Drag and Drop the icon on the map or just click on the location where your incident occurred</label>
+                        <hr>
+                        <label class="radio control-label">Date and Time when it happened*</label>
+                        <div class = "row">
+                            <div class="form-group  col-xs-6" required>
+                                <p class="input-group" style="margin-top:35px">
+                                  <input type="text" class="form-control" uib-datepicker-popup="{{format}}" ng-model="formData.dt" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" init-date="null" ng-required="true" close-text="Close" show-weeks="false" placeholder="Click the calendar ->"required readonly/>
+                                  <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                  </span>
+                                </p>
+                            </div>
+                            <div class="form-group  col-xs-6">
+                                <uib-timepicker ng-model="formData.time" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></uib-timepicker>
+                            </div>
+                        </div>
+                        <hr>
+                        <!-- CRIME TYPE-->
+                        <label class="radio control-label">Incident to report<span ng-show="!formData.crimetype" class="error">*</span></label>
+
+                        <div class="form-group" ng-required="true">
+                            <label class="radio-inline">
+                                <input type="radio" name="optionscrimes" id="radiobike" value="bike" ng-model="formData.crimetype" ng-required="true">
+                                Stolen Bike
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="optionscrimes" id="radiocar" value="car" ng-model="formData.crimetype" ng-required="true">
+                                Stolen Car
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="optionscrimes" id="radiostreet" value="robbery" ng-model="formData.crimetype" ng-required="true">
+                                Robbed on the Street
+                            </label>
+                        </div>
+                        <hr>
+
+                        <!-- LOST TYPE-->
+                        <div ng-show="formData.crimetype == 'bike' || formData.crimetype == 'car'">
+                            <label class="radio control-label">Partial or total lost?<span ng-show="!formData.losttype" class="error">*</span></label>
+                            <div class="form-group">
+                                <label class="radio-inline">
+                                    <input type="radio" name="optionslost" id="radiototal" value="total" ng-model="formData.losttype" ng-required="survey.formData.crimetype == 'bike' || formData.crimetype == 'car'">
+                                    Total
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="optionslost" id="radiopartial" value="partial" ng-model="formData.losttype" ng-required="formData.crimetype == 'bike' || formData.crimetype == 'car'">
+                                    Partial
+                                </label>
+                            </div>
+                            <hr>
+                        </div>
+                        <!-- CAR STOLEN PARTS-->
+                        <div ng-show="formData.crimetype == 'car'">
+
+                            <div ng-show="formData.losttype == 'partial'">
+                               <label class="radio control-label">Stolen Parts <span ng-show="!anySelected" class="error" >*(at least one)</span></label>
+                               <div class="form-group">
+                                        <label class="checkbox-inline"><input type="checkbox" ng-true-value="'wheels'" ng-model="formData.stolencar.carwheels" id="carwheels" ng-change="onCheckBoxSelected()" ng-required="!anySelected && formData.crimetype == 'car' && formData.losttype == 'partial'">Wheels/Rim</labe>
+                                        <label class="checkbox-inline"><input type="checkbox" ng-true-value="'mirrors'" ng-model="formData.stolencar.carmirrors" id="mirrors" ng-change="onCheckBoxSelected()" ng-required="!anySelected && formData.crimetype == 'car' && formData.losttype == 'partial'">Mirrors</label>
+                                        <label class="checkbox-inline"><input type="checkbox" ng-true-value="'personal'" ng-model="formData.stolencar.carpersonal" id="pbelong" ng-change="onCheckBoxSelected()" ng-required="!anySelected && formData.crimetype == 'car' && formData.losttype == 'partial'">Personal Belongings</label>
+                                        <label class="checkbox-inline"><input type="checkbox" ng-true-value="'stereo'" ng-model="formData.stolencar.carstereo" id="stereo" ng-change="onCheckBoxSelected()" ng-required="!anySelected && formData.crimetype == 'car' && formData.losttype == 'partial'">Stereo</label>
+                                        <label class="checkbox-inline"><input type="checkbox" ng-true-value="'other'" ng-model="formData.stolencar.carother" id="carother" ng-change="onCheckBoxSelected()" ng-required="!anySelected && formData.crimetype == 'car' && formData.losttype == 'partial'">Other</label>
+                                </div>
+                                <hr>
+                            </div>
+                            <!-- CAR SECURITY USED-->
+                           <label class="radio control-label">Security Used<span ng-show="!anyCarSecuritySelected" class="error" >*(at least one)</span></label>
+                           <div class="form-group">
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'alarm'" ng-model="formData.carsecurity.caralarm" id="caralarm" ng-change="onCheckCarSecuritySelected()" ng-required="!anyCarSecuritySelected && formData.crimetype == 'car'">Alarm</labe>
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'nuts'" ng-model="formData.carsecurity.carnuts" id="carnuts" ng-change="onCheckCarSecuritySelected()" ng-required="!anyCarSecuritySelected && formData.crimetype == 'car'">Locking wheel nuts</label>
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'other'" ng-model="formData.carsecurity.carother" id="carnone" ng-change="onCheckCarSecuritySelected()" ng-required="!anyCarSecuritySelected && formData.crimetype == 'car'">Other</label>
+                            </div>
+                            <hr>
+                        </div>
+                        <!-- BIKE STOLEN PARTS-->
+                        <div ng-show="formData.crimetype == 'bike'">
+
+                            <div ng-show="formData.losttype == 'partial'">
+                               <label class="radio control-label">Stolen Parts<span ng-show="!anybikeSelected" class="error" >*(at least one)</span></label>
+                               <div class="form-group">
+                                        <label class="checkbox-inline"><input type="checkbox" ng-true-value="'front'" ng-model="formData.stolenbike.bikefront" id="frontwheel" ng-change="onCheckBikeSelected()" ng-required="!anybikeSelected && formData.crimetype == 'bike' && formData.losttype == 'partial'">Front wheel</labe>
+                                        <label class="checkbox-inline"><input type="checkbox" ng-true-value="'back'" ng-model="formData.stolenbike.bikeback" id="backwheel" ng-change="onCheckBikeSelected()" ng-required="!anybikeSelected && formData.crimetype == 'bike' && formData.losttype == 'partial'">Back wheel</label>
+                                        <label class="checkbox-inline"><input type="checkbox" ng-true-value="'seat'" ng-model="formData.stolenbike.bikeseat" id="seat" ng-change="onCheckBikeSelected()" ng-required="!anybikeSelected && formData.crimetype == 'bike' && formData.losttype == 'partial'">Seat</label>
+                                        <label class="checkbox-inline"><input type="checkbox" ng-true-value="'other'" ng-model="formData.stolenbike.bikeother" id="bikeother" ng-change="onCheckBikeSelected()" ng-required="!anybikeSelected && formData.crimetype == 'bike' && formData.losttype == 'partial'">Other</label>
+                                </div>
+                                <hr>
+                            </div>
+                            <!-- BIKE SECURITY USED-->
+                           <label class="radio control-label">Security Used<span ng-show="!anyBikeSecuritySelected" class="error" >*(at least one)</span></label>
+                           <div class="form-group">
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'udlock'" ng-model="formData.bikesecurity.bikeudlock" id="bikeudlock" ng-change="onCheckBikeSecuritySelected()" ng-required="!anyBikeSecuritySelected && formData.crimetype == 'bike'">U/D lock</labe>
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'chain'" ng-model="formData.bikesecurity.bikechain" id="bikechain" ng-change="onCheckBikeSecuritySelected()" ng-required="!anyBikeSecuritySelected && formData.crimetype == 'bike'">Chain</label>
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'cable'" ng-model="formData.bikesecurity.bikecable" id="bikecable" ng-change="onCheckBikeSecuritySelected()" ng-required="!anyBikeSecuritySelected && formData.crimetype == 'bike'">Cable lock</label>
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'wheellock'" ng-model="formData.bikesecurity.bikewheellock" id="bikewheellock" ng-change="onCheckBikeSecuritySelected()" ng-required="!anyBikeSecuritySelected && formData.crimetype == 'bike'">Wheel lock</label>
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'other'" ng-model="formData.bikesecurity.bikeothersecurity" id="bikeothersecurity" ng-change="onCheckBikeSecuritySelected()" ng-required="!anyBikeSecuritySelected && formData.crimetype == 'bike'">Other</label>
+                            </div>
+                            <hr>
+                        </div>
+
+                        <!-- VIOLENCE USED-->
+                        <label class="radio control-label">Violence<span ng-show="!formData.violence" class="error">*</span></label>
+                        <div class="form-group">
+
+                                <label class="radio-inline">
+                                    <input type="radio" name="optionsviolence" id="radioyes" value="true" ng-model="formData.violence">
+                                    Yes
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="optionsviolence" id="radiono" value="false" ng-model="formData.violence">
+                                    No
+                                </label>
+                        </div>
+                        <hr>
+                        <!-- CASE VIOLENCE IS TRUE-->
+                        <div ng-show="formData.violence == 'true'">
+                            <div class="form-group">
+                                <label for="age">Number of thieves(min 1 max 20)</label>
+                                <input type="number" class="form-control" id="thiefs" maxlength="2" min="1"max="20" placeholder="1" ng-model="formData.thiefs" ng-required="formData.violence == 'true'">
+                            </div>
+                            <hr>
+
+                            <!-- VIOLENCE USED-->
+                           <label class="radio control-label">Weapons Used<span ng-show="!anyWaponSelected" class="error" >*(at least one)</span></label>
+                           <div class="form-group">
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'cold'" ng-model="formData.weapons.colweapon" id="colweapon" ng-change="onCheckWaponSelected()" ng-required="!anyWaponSelected && formData.violence == 'true'">Cold weapon</labe>
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'fire'" ng-model="formData.weapons.fireweapon" id="fireweapon" ng-change="onCheckWaponSelected()" ng-required="!anyWaponSelected && formData.violence == 'true'">Fire weapon</label>
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'force'" ng-model="formData.weapons.forceviolence" id="forceviolence" ng-change="onCheckWaponSelected()" ng-required="!anyWaponSelected && formData.violence == 'true'">Force</label>
+                                    <label class="checkbox-inline"><input type="checkbox" ng-true-value="'none'" ng-model="formData.weapons.noneviolence" id="noneviolence" ng-change="onCheckWaponSelected()" ng-required="!anyWaponSelected && formData.violence == 'true'">None</label>
+                            </div>
+                            <hr>
+                        </div>
+                        <!-- EVENT PLACE-->
+                        <div class="form-group">
+                            <input type="hidden" class="form-control" id="latitude" value="39.500" ng-model="formData.latitude">
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" class="form-control" id="longitude" value="-98.350" ng-model="formData.longitude">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="longitude">Email (NOT stored just to confirm)</label>
+                            <input type="email" class="form-control" id="email" placeholder="email@domain.com" ng-model="formData.email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="longitude">Confirm email</label>
+                            <input type="email" class="form-control" id="email2" placeholder="email@domain.com" ng-model="formData.email2" match="formData.email" required>
+                        </div>
+
+                        <!-- Submit button. Note that its tied to createUser() function from addCtrl. Also note ng-disabled logic which prevents early submits.  -->
+                        <button type="submit" class="btn btn-danger btn-block" ng-click="openconfirm()" ng-disabled="addForm.$invalid">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Confirmation</h3>
+        </div>
+        <div class="modal-body">
+        <p>Before submit your report please consider and confirm the following:</p>
+            <ul>
+                <li>
+                    1) The incident is real and the event happened.
+                </li>
+                <li>
+                    2) This incident is personal and happened to me, I am not submitting in behalf of someone else.
+                </li>
+            </ul>
+        <p>Please keep this information as accurate as possible in order to help everyone to have precaussion on the places they live or will be visiting or stary</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="myModalThanks.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Thanks! </h3>
+        </div>
+        <div class="modal-body">
+        <p>Thanks for sharing and sorry the bad experience you had, before everyone could see your report in the search page, it is important to confirm your incident, we have sent you an email with a link that you need to click.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+        </div>
+    </script>

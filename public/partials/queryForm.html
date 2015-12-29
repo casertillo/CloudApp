@@ -1,0 +1,89 @@
+<!-- queryForm.html -->
+        <div class="col-md-7">
+            <div id="map"  style="width:100%; height:645px"></div>
+        </div>
+<!-- Find Teammates (Query) Form -->
+<div class="col-md-5 pull-right">
+
+    <!-- Creates Main Panel -->
+    <div class="panel panel-default">
+
+        <!-- Panel Title -->
+        <div class="panel-heading">
+            <h2 class="panel-title text-center">Find Incidents around your place<span class="glyphicon glyphicon-search"></span></h2>
+        </div>
+
+        <!-- Panel Body -->
+        <div class="panel-body">
+
+            <!-- Creates Form -->
+            <form name ="queryForm">
+
+                <!-- Text Boxes and Other User Inputs. Note ng-model binds the values to Angular $scope -->
+                <div class="form-group">
+                    <input type="hidden" class="form-control" id="latitude" placeholder="39.5" ng-model="formData.latitude">
+                </div>
+                <div class="form-group">
+                    <input type="hidden" class="form-control" id="longitude" placeholder="-98.35" ng-model="formData.longitude">
+                </div>
+                <div class="form-group">
+                    <label for="distance">Max. Distance (miles)</label>
+
+                <div range-slider min="minDistance" max="maxDistance" model-min="userMin" model-max="formData.distance" show-values="true" pin-handle="min" prevent-equal-min-max="true" step="1" ng-model="formData.distance"></div>
+                </div>
+                <hr>
+                <!-- Note ng-true-value which translates check values into explicit gender strings -->
+                <label>Type</label>
+                <div class="form-group">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="optionsRadios" id="checkbike" value="bike" ng-model="formData.bike" ng-true-value = "'bike'" ng-change="onCheckBoxSelected()">
+                        Bike
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="optionsRadios" id="checkcar" value="car" ng-model="formData.car" ng-true-value="'car'" ng-change="onCheckBoxSelected()">
+                        Car
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="optionsRadios" id="checkrobbery" value="robbery" ng-model="formData.robbery" ng-true-value="'robbery'" ng-change="onCheckBoxSelected()">
+                        Robbed
+                    </label>
+                </div>
+                <hr>
+                <div ng-show="formData.bike == 'bike' || formData.car == 'car'">
+                    <label>Lost Type</label>
+                    <div class="form-group">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="optionsRadios" id="checkmale" value="total" ng-model="formData.total" ng-true-value = "'total'">
+                            Total
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="optionsRadios" id="checkfemale" value="partial" ng-model="formData.partial" ng-true-value="'partial'">
+                            Partial
+                        </label>
+                    </div>
+                </div>
+                <!-- VIOLENCE USED-->
+                <label class="radio control-label">Violence</label>
+                <div class="form-group">
+
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="optionsviolence" id="radioyes" value="true" ng-model="formData.violenceyes">
+                        Yes
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="optionsviolence" id="radiono" value="false" ng-model="formData.violenceno">
+                        No
+                    </label>
+                </div>
+
+                <!-- Query button. Note that its tied to queryUsers() function from queryCtrl.  -->
+                <button type="submit" class="btn btn-danger btn-block" ng-click="queryCrimes()">Search</button>
+            </form>
+        </div>
+
+        <!-- Footer panel for displaying count. Note how it will only display if queryCount is greater than 0 -->
+        <div class="panel-footer">
+            <p class="text-center">Found {{queryCount}} Incident(s)</p>
+        </div>
+    </div>
+</div>
