@@ -1,5 +1,35 @@
 // Creates the addCtrl Module and Controller. Note that it depends on 'geolocation' and 'gservice' modules.
 var queryCtrl = angular.module('queryCtrl', ['geolocation', 'gservice', 'ui-rangeSlider', 'ui.bootstrap']);
+
+queryCtrl.directive('googleplace', function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attrs, model) {
+            var options = {
+                types: ['geocode'],
+            };
+            scope.gPlace = new google.maps.places.Autocomplete(element[0], options);
+
+            google.maps.event.addListener(scope.gPlace, 'place_changed', function() {
+                var place = scope.gPlace.getPlace();
+                var details = place.geometry && place.geometry.location ? {
+                        latitude: place.geometry.location.lat(),
+                        longitude: place.geometry.location.lng()
+                    } : {};
+
+                scope.$apply(function() {
+                    if(place.geometry)
+                    {
+                        scope.formData.latitude = place.geometry.location.lat();
+                        scope.formData.longitude = place.geometry.location.lng();  
+                        scope.queryCrimes();
+                    }              
+                });
+            });
+        }
+    };
+});
+
 queryCtrl.controller('queryCtrl', function($scope, $log, $http, $rootScope, geolocation, gservice){
 
     // Initializes Variables
@@ -9,7 +39,6 @@ queryCtrl.controller('queryCtrl', function($scope, $log, $http, $rootScope, geol
     var coords = {};
     var lat = 0;
     var long = 0;
-
 
 // set available range
 $scope.minDistance = 0;
@@ -62,6 +91,15 @@ $scope.formData.distance = 10;
         });
     });
 
+    $rootScope.$on("dragged", function(){
+
+        // Run the gservice functions associated with identifying coordinates
+        $scope.$apply(function(){
+            $scope.formData.latitude = parseFloat(gservice.clickLat).toFixed(3);
+            $scope.formData.longitude = parseFloat(gservice.clickLong).toFixed(3);
+        });
+    });
+
   //----------------CHECK BOXES-------------------------
     $scope.onCheckBoxSelected=function() {
         if(($scope.formData.bike == false || $scope.formData.bike == undefined ) && ($scope.formData.car == false || $scope.formData.car == undefined) && $scope.formData.robbery == 'robbery')
@@ -88,7 +126,7 @@ $scope.formData.distance = 10;
             partial:    $scope.formData.partial,
             //violence
             violenceyes: $scope.formData.violenceyes,
-            violenceno: $scope.formData.violenceno, 
+            violenceno: $scope.formData.violenceno 
         };
 
         // Post the queryBody to the /query POST route to retrieve the filtered results

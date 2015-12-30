@@ -299,7 +299,6 @@ geolocation.getLocation().then(function(data){
             // Saves the user data to the db
           $http.post('/crimes', datasend)
             .success(function (data) {
-              console.log(JSON.stringify(data,null, 4));
               var modalInstance = $uibModal.open({
                 animation: $scope.animationsEnabled,
                 templateUrl: 'myModalThanks.html',

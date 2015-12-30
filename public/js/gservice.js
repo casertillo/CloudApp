@@ -99,7 +99,7 @@ angular.module('gservice', [])
                 var day = objDate.getDate();
                 var month = objDate.getMonth()+1;
                 var year = objDate.getFullYear();
-                var hour = objDate.getHours()+1;
+                var hour = objDate.getHours();
                 var minute = objDate.getMinutes();
                 if(crime.crimetype != 'robbery')
                 {
@@ -126,20 +126,27 @@ angular.module('gservice', [])
                             }
                         }
                     }
-                    if(crime.violenceused)
-                    {
-                        thiefs = '<br><b>Thieves: </b> ' + crime.numberthiefs;
-                        weapons = '<br><b>Weapons: </b> ';
-                        for(var j =0; j< crime.weaponsused.length; j++)
-                        {                   
-                            if(crime.weaponsused[j] != null && crime.weaponsused[j] != 'false')
-                            {
-                                weapons += crime.weaponsused[j]+" ";
-                            }
-                        }                        
-                    }
                 }
                 
+                if(crime.violenceused)
+                {
+                    if(crime.numberthiefs > 1)
+                    {
+                        thiefs = '<br><b>Thieves: </b> ' + crime.numberthiefs;
+                    }
+                    else
+                    {
+                       thiefs = '<br><b>Thief: </b> ' + crime.numberthiefs; 
+                    }
+                    weapons = '<br><b>Weapons: </b> ';
+                    for(var j =0; j< crime.weaponsused.length; j++)
+                    {                   
+                        if(crime.weaponsused[j] != null && crime.weaponsused[j] != 'false')
+                        {
+                            weapons += crime.weaponsused[j]+" ";
+                        }
+                    }                        
+                }
                 // Create popup windows for each record
                 var  contentString =
                     '<p><b>Type</b>: ' + crime.crimetype +
@@ -238,6 +245,11 @@ var initialize = function(latitude, longitude, filter) {
         draggable: true,
         icon: curricon
     });
+    google.maps.event.addListener(marker, "drag", function (mEvent) {
+        googleMapService.clickLat = marker.getPosition().lat();
+        googleMapService.clickLong = marker.getPosition().lng();
+        $rootScope.$broadcast("dragged");
+    }); 
     lastMarker = marker;
 
     bounds.extend(initialLocation);
@@ -253,7 +265,11 @@ var initialize = function(latitude, longitude, filter) {
             draggable: true,
             icon: curricon
         });
-
+        google.maps.event.addListener(marker, "drag", function (mEvent) {
+            googleMapService.clickLat = marker.getPosition().lat();
+            googleMapService.clickLong = marker.getPosition().lng();
+            $rootScope.$broadcast("dragged");
+        }); 
         bounds.extend(e.latLng);
         // When a new spot is selected, delete the old red bouncing marker
         if(lastMarker){
