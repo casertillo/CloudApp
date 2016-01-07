@@ -11,7 +11,7 @@ var app             = express();
 // Express Configuration
 // -----------------------------------------------------
 // Sets the connection to MongoDB changed to use the amazon web service
-mongoose.connect("mongodb://ReaderUser:AlphaOmega@ec2-52-25-247-57.us-west-2.compute.amazonaws.com:27017/dummyDB");
+mongoose.connect("mongodb://ReaderUser:AlphaOmega@ec2-52-11-236-45.us-west-2.compute.amazonaws.com:27017/dummyDB");
 
 // Logging and Parsing
 app.use(express.static(__dirname + '/public'));                 // sets the static files location to public
